@@ -15,8 +15,7 @@ async function fillToday(statusContainer, schedule, entropyMinutes) {
   await fillFor(statusContainer, startOfToday, endOfToday, schedule, entropyMinutes);
 }
 
-async function fillCurrentMonth(statusContainer, schedule, entropyMinutes) {
-  var currentDate = new Date();
+async function fillMonth(statusContainer, currentDate, schedule, entropyMinutes) {
   const monthStart = startOfMonth(currentDate);
   const monthEnd = endOfDay(currentDate);
   await fillFor(statusContainer, monthStart, monthEnd, schedule, entropyMinutes);
@@ -73,7 +72,12 @@ var allowEntriesInTheFuture = false;
   extDiv.style.textAlign = 'center';
   extDiv.className = 'btn-group-kenbuddy';
 
+  const extDiv2 = document.createElement('div');
+  extDiv2.style.textAlign = 'center';
+  extDiv2.className = 'btn-group-kenbuddy';
+
   const monthBtn = document.createElement('button');
+  const monthBtn2 = document.createElement('button');
   const todayBtn = document.createElement('button');
   const weekBtn = document.createElement('button');
   
@@ -95,7 +99,15 @@ var allowEntriesInTheFuture = false;
     extDiv.append(monthBtn);
   }
 
-  var selector = await checkElement('orgos-widget-attendance');
+  if (showFillMonth){
+    monthBtn2.type = 'button';
+    monthBtn2.innerText = browser.i18n.getMessage('fillAttendanceMonthTitle');
+    extDiv2.append(monthBtn2);
+  }
+
+  // var selector = await checkElement('orgos-widget-attendance');
+  console.log("waiting for month picker");
+  var selector2 = await checkElement('kenjo-input-month-picker');
 
   var hasEntryForToday = false;
   var hasEntryForCurrentWeek = false;
@@ -125,7 +137,8 @@ var allowEntriesInTheFuture = false;
     hasEntryForToday = false;
   }
 
-  monthBtn.onclick = function() { this.disabled = "disabled"; fillCurrentMonth(this, localSchedule, localEntropyMinutes); }
+  monthBtn.onclick = function() { this.disabled = "disabled"; fillMonth(this, new Date(), localSchedule, localEntropyMinutes); }
+  monthBtn2.onclick = function() { this.disabled = "disabled"; fillMonth(this, new Date(document.querySelector("kenjo-input-month-picker").innerText), localSchedule, localEntropyMinutes); }
 
   if (hasEntryForToday){
     todayBtn.disabled = true;
@@ -141,5 +154,8 @@ var allowEntriesInTheFuture = false;
     weekBtn.onclick = function() { this.disabled = "disabled"; fillCurrentWeek(this, localSchedule, localEntropyMinutes); }
   }
   
-  selector.append(extDiv);
+  // selector.append(extDiv);
+  selector2.append(extDiv2);
+
+  console.log("did append everything")
 })();
